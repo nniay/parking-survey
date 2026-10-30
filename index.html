@@ -14,21 +14,21 @@
 <section class="panel"><div class="maphead"><input id="searchBox" placeholder="搜尋地名或地址（需網路）"><button id="searchBtn">搜尋</button><button id="locateBtn">開始追蹤位置</button><button id="baseBtn">切換底圖</button></div><div id="map"></div><div class="hint">操作方式：點擊地圖新增資料；點擊既有標記可編輯。底圖預設臺灣通用電子地圖，可切換正射影像。</div></section>
 <div class="modal-backdrop" id="formBackdrop"><section class="panel form modal-form"><div class="modal-head"><h2 id="formTitle">新增停車格資料</h2><button class="close-modal" id="closeModal" aria-label="關閉">×</button></div><div class="grid2"><div class="field"><label for="latitude">緯度</label><input id="latitude" type="text" inputmode="decimal" placeholder="輸入緯度"></div><div class="field"><label for="longitude">經度</label><input id="longitude" type="text" inputmode="decimal" placeholder="輸入經度"></div></div><div class="coord" id="coord">可直接輸入經緯度，或拖曳地圖標記調整位置</div>
 <div class="field"><label for="roadName">路名</label><input id="roadName" placeholder="點擊地圖後嘗試自動帶入，也可手動輸入"></div>
-<div class="field"><label>路段</label><div class="grid2"><input id="roadSection1" placeholder="起始路名／路段"><input id="roadSection2" placeholder="結束路名／路段"></div><div class="hint">匯出格式：起始路名-結束路名</div></div>
+<div class="field"><label>路段</label><div class="grid2"><input id="roadSection1" placeholder="起始路名"><input id="roadSection2" placeholder="結束路名"></div><div class="hint">
 <div class="field"><label for="stallId">車格編號</label><input id="stallId" placeholder="例如：P-001"></div>
 <div class="field"><label for="surveyDate">調查日期</label><input id="surveyDate" type="date"></div>
-<div class="grid2"><div class="field"><label for="lengthM">長（M）</label><input id="lengthM" type="number" min="4" max="7" step="0.01" inputmode="decimal" placeholder="限填 4–7 公尺"></div><div class="field"><label for="widthM">寬（M）</label><input id="widthM" type="number" min="1" max="4" step="0.01" inputmode="decimal" placeholder="限填 1–4 公尺"></div></div>
+<div class="grid2"><div class="field"><label for="lengthM">長（M）</label><input id="lengthM" type="number" min="4" max="7" step="0.01" inputmode="decimal" placeholder="車格長度"></div><div class="field"><label for="widthM">寬（M）</label><input id="widthM" type="number" min="1" max="4" step="0.01" inputmode="decimal" placeholder="車格寬度"></div></div>
 <div class="field"><label for="type">車格類型</label><select id="type"><option>一般</option><option>身障</option><option>卸貨</option></select></div>
 <div class="field"><label for="adjacency">單獨／相鄰</label><select id="adjacency"><option>單獨</option><option>相鄰(端點)</option></select></div>
 <div class="field"><label for="photo1">格位照片1（必填）</label><input id="photo1" type="file" accept="image/*" required><div id="photoPreview1" class="photo-preview" aria-live="polite"></div></div>
-<div class="field"><label for="photo2">格位照片2（檔名）</label><input id="photo2" type="file" accept="image/*"><div id="photoPreview2" class="photo-preview" aria-live="polite"></div></div>
+<div class="field"><label for="photo2">格位照片2</label><input id="photo2" type="file" accept="image/*"><div id="photoPreview2" class="photo-preview" aria-live="polite"></div></div>
 <div class="field"><label>障礙物（可複選）</label><div class="tag-options" id="obstacleTags"></div><input id="obstacleOther" class="other-input" placeholder="其他障礙物，請手動填寫" style="display:none"></div>
 <div class="field"><label>現況（可複選）</label><div class="tag-options" id="conditionTags"></div><input id="conditionOther" class="other-input" placeholder="其他現況，請手動填寫" style="display:none"></div>
 <div class="field"><label>疑屬禁停範圍（可複選）</label><div class="tag-options" id="noParkingTags"></div><div id="noParkingInputs"></div></div><div class="field"><label for="note">備註</label><textarea id="note" placeholder="補充說明"></textarea></div>
 <div class="buttons"><button id="newBtn">清空／新增</button><button class="primary" id="saveBtn">儲存這筆資料</button></div><div class="buttons"><button id="deleteBtn" class="danger" style="display:none">刪除這筆</button><button id="cancelBtn">取消</button></div>
 </section></div>
-<section class="panel records"><div class="recordhead"><h2>調查紀錄 <span id="recordCount">0</span> 筆</h2><div class="record-actions"><button id="exportBtn">匯出 CSV</button><button id="backupBtn">備份(JSON檔)</button><button id="importBtn">還原備份</button><input type="file" id="importFile" accept=".json,application/json" hidden></div></div><div class="record-list" id="recordList"><div class="empty">目前尚無紀錄。點擊地圖開始新增。</div></div></section>
-</main><div class="foot">底圖來源：國土測繪中心臺灣通用電子地圖／正射影像。調查紀錄會存於本機瀏覽器資料中；格位照片僅記錄檔名，不會儲存圖片本身。新增、修改或刪除資料後，按下「儲存這筆資料」即會寫入本機；請定期使用「備份(JSON檔)」下載備份；清除瀏覽器資料或更換手機可能導致本機紀錄消失。</div><div class="toast" id="toast"></div>
+<section class="panel records"><div class="recordhead"><h2>調查紀錄 <span id="recordCount">0</span> 筆</h2><div class="record-actions"><button id="exportAllBtn">匯出 CSV＋JSON</button><button id="importBtn">匯入 CSV／JSON</button><input type="file" id="importFile" accept=".csv,.json,text/csv,application/json" hidden></div></div><div class="record-list" id="recordList"><div class="empty">目前尚無紀錄。點擊地圖開始新增。</div></div></section>
+</main><div class="foot">底圖來源：國土測繪中心臺灣通用電子地圖／正射影像。調查紀錄會存於本機瀏覽器資料中；格位照片僅記錄檔名，不會儲存圖片本身。新增、修改或刪除資料後，按下「儲存這筆資料」即會寫入本機；請定期使用「匯出 CSV＋JSON」下載備份；清除瀏覽器資料或更換手機可能導致本機紀錄消失。</div><div class="toast" id="toast"></div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
 (()=>{'use strict';
@@ -79,7 +79,8 @@ function renderList(){ $('recordCount').textContent=records.length;$('recordList
 function selectPosition(latlng){selectedLatLng=latlng;syncCoordinateInputs(latlng);if(pendingMarker)map.removeLayer(pendingMarker);if(!editingId){pendingMarker=L.marker(latlng,{draggable:true}).addTo(map);pendingMarker.on('dragstart',()=>{pendingMarker._oldLatLng=pendingMarker.getLatLng()});pendingMarker.on('dragend',()=>confirmMarkerMove(pendingMarker,pendingMarker._oldLatLng||selectedLatLng,pendingMarker.getLatLng()));$('formTitle').textContent='新增停車格資料'}openModal();if(!$('roadName').value.trim())lookupRoadName(latlng)}
 async function lookupRoadName(ll){try{const u=`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${ll.lat}&lon=${ll.lng}&zoom=18&addressdetails=1`;const res=await fetch(u);if(!res.ok)return;const d=await res.json();const a=d.address||{};const road=a.road||a.pedestrian||a.footway||a.path||a.residential||'';if(road&&!$('roadName').value.trim())$('roadName').value=road;}catch(e){/* 自動帶入失敗時由使用者手動輸入 */}}
 map.on('click',e=>{editingId=null;clearForm(false);selectPosition(e.latlng);});$('latitude').addEventListener('change',coordinateInputChanged);$('longitude').addEventListener('change',coordinateInputChanged);
-function clearForm(clearPos=true){['roadName','roadSection1','roadSection2','stallId','lengthM','widthM','obstacleOther','conditionOther','note'].forEach(id=>$(id).value='');renderNoParkingTags();$('surveyDate').value=new Date().toISOString().slice(0,10);$('type').value='一般';$('adjacency').value='單獨';$('photo1').value='';$('photo2').value='';photoThumb('photoPreview1','');photoThumb('photoPreview2','');renderTags('obstacleTags',['無','階梯','斜坡','桿類','箱類','水溝孔','樹','雜物','其他'],[]);renderTags('conditionTags',['無特殊情況','漆線剝落','塗銷漆線剝落','柏油坑洞','其他'],[]);editingId=null;$('formTitle').textContent='新增停車格資料';$('deleteBtn').style.display='none';if(clearPos){selectedLatLng=null;$('latitude').value='';$('longitude').value='';$('coord').textContent='尚未選擇位置';if(pendingMarker){map.removeLayer(pendingMarker);pendingMarker=null}} }
+function applyRecentRoadSection(){const recent=records.length?records[records.length-1]:null;if(recent){const parts=String(recent.roadSection||'').split('-');$('roadSection1').value=recent.roadSectionStart??parts[0]??'';$('roadSection2').value=recent.roadSectionEnd??parts.slice(1).join('-')??'';}}
+ function clearForm(clearPos=true){['roadName','roadSection1','roadSection2','stallId','lengthM','widthM','obstacleOther','conditionOther','note'].forEach(id=>$(id).value='');renderNoParkingTags();$('surveyDate').value=new Date().toISOString().slice(0,10);$('type').value='一般';$('adjacency').value='單獨';$('photo1').value='';$('photo2').value='';photoThumb('photoPreview1','');photoThumb('photoPreview2','');renderTags('obstacleTags',['無','階梯','斜坡','桿類','箱類','水溝孔','樹','雜物','其他'],[]);renderTags('conditionTags',['無特殊情況','漆線剝落','塗銷漆線剝落','柏油坑洞','其他'],[]);applyRecentRoadSection();editingId=null;$('formTitle').textContent='新增停車格資料';$('deleteBtn').style.display='none';if(clearPos){selectedLatLng=null;$('latitude').value='';$('longitude').value='';$('coord').textContent='尚未選擇位置';if(pendingMarker){map.removeLayer(pendingMarker);pendingMarker=null}} }
 async function editRecord(id){const r=records.find(x=>x.id===id);if(!r)return;if(pendingMarker){map.removeLayer(pendingMarker);pendingMarker=null}editingId=id;selectedLatLng=L.latLng(r.lat,r.lng);$('formTitle').textContent='編輯停車格資料';syncCoordinateInputs(selectedLatLng);$('roadName').value=r.roadName||r.road||'';const parts=String(r.roadSection||'').split('-');$('roadSection1').value=r.roadSectionStart??parts[0]??'';$('roadSection2').value=r.roadSectionEnd??parts.slice(1).join('-')??'';$('stallId').value=r.stallId||'';$('surveyDate').value=r.surveyDate||new Date().toISOString().slice(0,10);$('lengthM').value=r.lengthM||'';$('widthM').value=r.widthM||'';$('type').value=['一般','身障','卸貨'].includes(r.type)?r.type:'一般';$('adjacency').value=r.adjacency||'單獨';$('note').value=r.note||'';$('obstacleOther').value=r.obstacleOther||'';$('conditionOther').value=r.conditionOther||'';setTags('obstacleTags',r.obstacles||[]);setTags('conditionTags',r.conditions||[]);renderNoParkingTags(Object.keys(r.noParkingRanges||{}),r.noParkingRanges||{});$('photo1').value='';$('photo2').value='';photoThumb('photoPreview1',r.photo1Name||(r.photo1&&!r.photo1.startsWith('data:')?r.photo1:''));photoThumb('photoPreview2',r.photo2Name||(r.photo2&&!r.photo2.startsWith('data:')?r.photo2:''));$('deleteBtn').style.display='block';openModal()}
 $('photo1').onchange=()=>photoThumb('photoPreview1',$('photo1').files[0]?.name||'');$('photo2').onchange=()=>photoThumb('photoPreview2',$('photo2').files[0]?.name||'');
 $('saveBtn').onclick=()=>{
@@ -87,10 +88,10 @@ $('saveBtn').onclick=()=>{
  if(!validCoordinates(lat,lng)){toast('請輸入有效的經緯度');return}
  selectedLatLng=L.latLng(lat,lng);
  const length=$('lengthM').value.trim(),width=$('widthM').value.trim();
- if(length!==''&&(!Number.isFinite(Number(length))||Number(length)<4||Number(length)>7)){toast('異常數值');$('lengthM').focus();return}
- if(width!==''&&(!Number.isFinite(Number(width))||Number(width)<1||Number(width)>4)){toast('異常數值');$('widthM').focus();return}
+ if(length!==''&&(!Number.isFinite(Number(length))||Number(length)<4||Number(length)>7||!$('lengthM').checkValidity())){toast('異常數值');$('lengthM').focus();return}
+ if(width!==''&&(!Number.isFinite(Number(width))||Number(width)<1||Number(width)>4||!$('widthM').checkValidity())){toast('異常數值');$('widthM').focus();return}
  const old=records.find(x=>x.id===editingId),p1=photoName('photo1',old?.photo1Name||old?.photo1),p2=photoName('photo2',old?.photo2Name||old?.photo2);
- if(!p1){toast('必填，請選擇照片');$('photo1').focus();return}
+ if(!p1){toast('未上傳格位照片');$('photo1').focus();return}
  const s1=$('roadSection1').value.trim(),s2=$('roadSection2').value.trim();
  const r={id:editingId||('p'+Date.now()+Math.random().toString(36).slice(2,7)),lat,lng,roadName:$('roadName').value.trim(),roadSection:[s1,s2].filter(Boolean).join('-'),roadSectionStart:s1,roadSectionEnd:s2,stallId:$('stallId').value.trim(),surveyDate:$('surveyDate').value,lengthM:length,widthM:width,type:$('type').value,adjacency:$('adjacency').value,photo1Name:p1,photo2Name:p2,obstacles:getTags('obstacleTags'),obstacleOther:$('obstacleOther').value.trim(),conditions:getTags('conditionTags'),conditionOther:$('conditionOther').value.trim(),noParkingRanges:getNoParkingValues(),note:$('note').value.trim(),createdAt:old?.createdAt||new Date().toISOString(),updatedAt:new Date().toISOString()};
  if(editingId)records=records.map(x=>x.id===editingId?r:x);else records.push(r);
@@ -141,11 +142,53 @@ window.addEventListener('pagehide',()=>{if(locationWatchId!==null){navigator.geo
 
 $('searchBtn').onclick=async()=>{const q=$('searchBox').value.trim();if(!q)return;try{const url='https://nominatim.openstreetmap.org/search?format=json&limit=1&q='+encodeURIComponent(q);const res=await fetch(url);const a=await res.json();if(!a.length){toast('找不到這個地點');return}const ll=L.latLng(+a[0].lat,+a[0].lon);map.setView(ll,17);selectPosition(ll)}catch(e){toast('搜尋失敗，請檢查網路或直接點擊地圖')}};$('searchBox').addEventListener('keydown',e=>{if(e.key==='Enter')$('searchBtn').click()});
 function download(name,content,type){const blob=new Blob([content],{type});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
-$('exportBtn').onclick=()=>{
- const cols=['id','lat','lng','roadName','roadSection','stallId','surveyDate','lengthM','widthM','type','adjacency','photo1Name','photo2Name','obstacles','obstacleOther','conditions','conditionOther','疑屬禁停範圍_路口(公尺)','疑屬禁停範圍_公車站(公尺)','疑屬禁停範圍_消防栓(公尺)','疑屬禁停範圍_消防車出入口(公尺)','note','createdAt','updatedAt'];
- const csv=[cols,...records.map(r=>[r.id,r.lat,r.lng,r.roadName,r.roadSection||[r.roadSectionStart,r.roadSectionEnd].filter(Boolean).join('-'),r.stallId,r.surveyDate,r.lengthM,r.widthM,r.type,r.adjacency,r.photo1Name,r.photo2Name,(r.obstacles||[]).join('、'),r.obstacleOther,(r.conditions||[]).join('、'),r.conditionOther,r.noParkingRanges?.['路口']??'',r.noParkingRanges?.['公車站']??'',r.noParkingRanges?.['消防栓']??'',r.noParkingRanges?.['消防車出入口']??'',r.note,r.createdAt,r.updatedAt])].map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\\r\\n');
- download('停車格調查_'+new Date().toISOString().slice(0,10)+'.csv','\\ufeff'+csv,'text/csv;charset=utf-8')
-};
-$('backupBtn').onclick=()=>download('停車格調查備份_'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify({version:1,savedAt:new Date().toISOString(),records},null,2),'application/json');$('importBtn').onclick=()=>$('importFile').click();$('importFile').onchange=async e=>{const f=e.target.files[0];if(!f)return;try{const d=JSON.parse(await f.text());const incoming=Array.isArray(d)?d:d.records;if(!Array.isArray(incoming))throw Error();if(!confirm(`備份內有 ${incoming.length} 筆資料。匯入會覆蓋目前 ${records.length} 筆資料，確定繼續？`))return;records=incoming;persist('備份已還原');redrawMarkers();renderList();toast('備份還原完成')}catch(err){toast('備份格式不正確')}e.target.value=''};
-load();redrawMarkers();renderList();setStatus('本機資料已載入');})();
+
+ const exportColumns=['id','lat','lng','roadName','roadSection','stallId','surveyDate','lengthM','widthM','type','adjacency','photo1Name','photo2Name','obstacles','obstacleOther','conditions','conditionOther','疑屬禁停範圍_路口(公尺)','疑屬禁停範圍_公車站(公尺)','疑屬禁停範圍_消防栓(公尺)','疑屬禁停範圍_消防車出入口(公尺)','note','createdAt','updatedAt'];
+ function recordsToCSV(){
+  const rows=[exportColumns,...records.map(r=>[r.id,r.lat,r.lng,r.roadName,r.roadSection||[r.roadSectionStart,r.roadSectionEnd].filter(Boolean).join('-'),r.stallId,r.surveyDate,r.lengthM,r.widthM,r.type,r.adjacency,r.photo1Name||r.photo1,r.photo2Name||r.photo2,(r.obstacles||[]).join('、'),r.obstacleOther,(r.conditions||[]).join('、'),r.conditionOther,r.noParkingRanges?.['路口']??'',r.noParkingRanges?.['公車站']??'',r.noParkingRanges?.['消防栓']??'',r.noParkingRanges?.['消防車出入口']??'',r.note,r.createdAt,r.updatedAt])];
+  return '\ufeff'+rows.map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');
+ }
+ $('exportAllBtn').onclick=()=>{
+  const date=new Date().toISOString().slice(0,10);
+  download('停車格調查_'+date+'.csv',recordsToCSV(),'text/csv;charset=utf-8');
+  download('停車格調查備份_'+date+'.json',JSON.stringify({version:1,savedAt:new Date().toISOString(),records},null,2),'application/json');
+  toast('CSV 與 JSON 已匯出');
+ };
+ function parseCSV(text){
+  text=text.replace(/^\ufeff/,'');
+  const rows=[];let row=[],cell='',quoted=false;
+  for(let i=0;i<text.length;i++){
+   const c=text[i],next=text[i+1];
+   if(quoted){if(c==='"'&&next==='"'){cell+='"';i++}else if(c==='"'){quoted=false}else cell+=c}
+   else if(c==='"')quoted=true;
+   else if(c===','){row.push(cell);cell=''}
+   else if(c==='\n'){row.push(cell);rows.push(row);row=[];cell=''}
+   else if(c!=='\r')cell+=c;
+  }
+  if(cell.length||row.length){row.push(cell);rows.push(row)}
+  if(!rows.length)return [];
+  const headers=rows.shift().map(x=>x.trim());
+  const get=(obj,k)=>obj[k]??'';
+  return rows.filter(r=>r.some(v=>v!=='')).map(values=>{
+   const o={};headers.forEach((h,i)=>o[h]=values[i]??'');
+   const parts=String(get(o,'roadSection')).split('-'),ranges={};
+   [['路口','疑屬禁停範圍_路口(公尺)'],['公車站','疑屬禁停範圍_公車站(公尺)'],['消防栓','疑屬禁停範圍_消防栓(公尺)'],['消防車出入口','疑屬禁停範圍_消防車出入口(公尺)']].forEach(([k,col])=>{if(get(o,col)!=='')ranges[k]=get(o,col)});
+   const splitTags=v=>String(v||'').split('、').map(x=>x.trim()).filter(Boolean);
+   return {id:get(o,'id')||('p'+Date.now()+Math.random().toString(36).slice(2,7)),lat:Number(get(o,'lat')),lng:Number(get(o,'lng')),roadName:get(o,'roadName'),roadSection:get(o,'roadSection'),roadSectionStart:parts[0]||'',roadSectionEnd:parts.slice(1).join('-'),stallId:get(o,'stallId'),surveyDate:get(o,'surveyDate'),lengthM:get(o,'lengthM'),widthM:get(o,'widthM'),type:get(o,'type')||'一般',adjacency:get(o,'adjacency')||'單獨',photo1Name:get(o,'photo1Name'),photo2Name:get(o,'photo2Name'),obstacles:splitTags(get(o,'obstacles')),obstacleOther:get(o,'obstacleOther'),conditions:splitTags(get(o,'conditions')),conditionOther:get(o,'conditionOther'),noParkingRanges:ranges,note:get(o,'note'),createdAt:get(o,'createdAt')||new Date().toISOString(),updatedAt:get(o,'updatedAt')||new Date().toISOString()};
+  });
+ }
+ $('importBtn').onclick=()=>$('importFile').click();
+ $('importFile').onchange=async e=>{
+  const f=e.target.files[0];if(!f)return;
+  try{
+   const content=await f.text();let incoming;
+   if(f.name.toLowerCase().endsWith('.csv'))incoming=parseCSV(content);
+   else{const d=JSON.parse(content);incoming=Array.isArray(d)?d:d.records}
+   if(!Array.isArray(incoming))throw Error('格式錯誤');
+   if(!confirm(`檔案內有 ${incoming.length} 筆資料。匯入會覆蓋目前 ${records.length} 筆資料，確定繼續？`))return;
+   records=incoming;persist('資料已匯入');redrawMarkers();renderList();toast('匯入完成');
+  }catch(err){toast('檔案格式不正確，請確認 CSV／JSON 格式')}
+  finally{e.target.value=''}
+ };
+ load();redrawMarkers();renderList();setStatus('本機資料已載入');})();
 </script></body></html>
