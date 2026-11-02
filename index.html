@@ -12,7 +12,7 @@
 <header><div><h1>📝停車格調查工具</h1><small>點擊地圖新增點位</small></div><div class="status" id="saveStatus">● 本機儲存待命</div></header>
 <main class="wrap">
 <section class="panel"><div class="maphead"><input id="searchBox" placeholder="搜尋地名或地址（需網路）"><button id="searchBtn">搜尋</button><button id="locateBtn">開始追蹤位置</button><button id="baseBtn">切換底圖</button></div><div id="map"></div><div class="hint">操作方式：點擊地圖新增資料；點擊既有標記可編輯。底圖預設臺灣通用電子地圖，可切換正射影像。</div></section>
-<div class="modal-backdrop" id="formBackdrop"><section class="panel form modal-form"><div class="modal-head"><h2 id="formTitle">新增停車格資料</h2><button class="close-modal" id="closeModal" aria-label="關閉">×</button></div><div class="grid2"><div class="field"><label for="latitude">緯度</label><input id="latitude" type="text" inputmode="decimal" placeholder="輸入緯度"></div><div class="field"><label for="longitude">經度</label><input id="longitude" type="text" inputmode="decimal" placeholder="輸入經度"></div></div><div class="coord" id="coord">可直接輸入經緯度，或拖曳地圖標記調整位置</div>
+<div class="modal-backdrop" id="formBackdrop"><section class="panel form modal-form"><div class="modal-head"><h2 id="formTitle">新增停車格資料</h2><button class="close-modal" id="closeModal" aria-label="關閉">×</button></div><div class="grid2"><div class="field"><label for="latitude">緯度</label><input id="latitude" type="number" step="0.000001" inputmode="decimal" placeholder="輸入緯度"></div><div class="field"><label for="longitude">經度</label><input id="longitude" type="number" step="0.000001" inputmode="decimal" placeholder="輸入經度"></div></div><div class="coord" id="coord">可直接輸入經緯度，或使用「校正點位」在地圖重新選取位置</div><div class="field" id="calibrationField" style="display:none"><button type="button" id="calibrateBtn">校正點位（於地圖重新選取）</button></div>
 <div class="field"><label for="roadName">路名</label><input id="roadName" placeholder="點擊地圖後自動帶入，可手動輸入"></div>
 <div class="field"><label>路段</label><div class="grid2"><input id="roadSection1" placeholder="起始路名"><input id="roadSection2" placeholder="結束路名"></div><div class="hint">
 <div class="field"><label for="stallId">車格編號</label><input id="stallId" placeholder="例如：P-001"></div>
@@ -22,7 +22,14 @@
 <div class="field"><label for="adjacency">單獨／相鄰</label><select id="adjacency"><option>單獨</option><option>相鄰(端點)</option></select></div>
 <div class="field"><label for="photo1">格位照片1（必填）</label><input id="photo1" type="file" accept="image/*" required><div id="photoPreview1" class="photo-preview" aria-live="polite"></div></div>
 <div class="field"><label for="photo2">格位照片2</label><input id="photo2" type="file" accept="image/*"><div id="photoPreview2" class="photo-preview" aria-live="polite"></div></div>
-<div class="field"><label>障礙物（可複選）</label><div class="tag-options" id="obstacleTags"></div><input id="obstacleOther" class="other-input" placeholder="其他障礙物，請手動填寫" style="display:none"></div>
+<div class="field"><label for="hasObstacle">障礙物</label><select id="hasObstacle"><option value="無">無</option><option value="有">有</option></select></div>
+<div id="obstacleDetails" style="display:none;border:1px solid #dbe3ed;border-radius:10px;padding:10px;margin:8px 0 12px">
+<div class="field"><label for="obstacleType">障礙物類型</label><select id="obstacleType"><option value="">請選擇</option><option>電力、電信箱體</option><option>桿件</option><option>消防栓與防災設施</option><option>樹穴與行道樹</option><option>私設斜坡道與車道口</option><option>移動式雜物</option><option>施工圍籬與廢棄物</option><option>廢棄車輛與長期占用物</option></select></div>
+<div class="field"><label for="obstaclePosition">障礙物位置</label><select id="obstaclePosition"><option value="">請選擇</option><option>人行道側</option><option>車道側</option><option>車格端點</option><option>車格中段</option></select></div>
+<div class="grid2"><div class="field"><label for="effectiveLength">有效淨長（公尺）</label><input id="effectiveLength" type="number" step="0.1" inputmode="decimal" placeholder="0.0"></div><div class="field"><label for="effectiveWidth">有效淨寬（公尺）</label><input id="effectiveWidth" type="number" step="0.1" inputmode="decimal" placeholder="0.0"></div></div>
+<div class="field"><label for="obstaclePermanence">固定或臨時</label><select id="obstaclePermanence"><option value="">請選擇</option><option>固定設施</option><option>臨時占用</option></select></div>
+<div class="field"><label for="facilityLabel">設施編號或銘牌</label><input id="facilityLabel" placeholder="手動填寫，如桿號、箱體編號、業者名稱"></div>
+<div class="field"><label for="reviewCode">複查結果代碼</label><select id="reviewCode"><option value="">請選擇</option><option value="0">0 新增</option><option value="1">1 仍存在、狀況相同</option><option value="2">2 仍存在、狀況改變</option><option value="3">3 已改善</option><option value="4">4 格位異動</option><option value="5">5 無法判讀</option></select></div></div>
 <div class="field"><label>現況（可複選）</label><div class="tag-options" id="conditionTags"></div><input id="conditionOther" class="other-input" placeholder="其他現況，請手動填寫" style="display:none"></div>
 <div class="field"><label>疑屬禁停範圍（可複選）</label><div class="tag-options" id="noParkingTags"></div><div id="noParkingInputs"></div></div><div class="field"><label for="note">備註</label><textarea id="note" placeholder="補充說明"></textarea></div>
 <div id="saveError" role="alert" style="display:none;margin-top:10px;padding:9px 11px;border:1px solid #f2b8b5;border-radius:8px;background:#fff3f2;color:#b42318;font-size:13px;font-weight:650"></div><div class="buttons"><button id="newBtn">清空／新增</button><button class="primary" id="saveBtn">儲存這筆資料</button></div><div class="buttons"><button id="deleteBtn" class="danger" style="display:none">刪除這筆</button><button id="cancelBtn">取消</button></div>
@@ -32,7 +39,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
 (()=>{'use strict';
-const KEY='parkingSurveyRecords_v1';let records=[],selectedLatLng=null,editingId=null,markers=new Map(),currentLocationMarker=null,pendingMarker=null;
+const KEY='parkingSurveyRecords_v1';let records=[],selectedLatLng=null,editingId=null,markers=new Map(),currentLocationMarker=null,pendingMarker=null,calibratingPoint=false;
 const $=id=>document.getElementById(id);const map=L.map('map',{preferCanvas:true,maxZoom:21}).setView([23.6978,120.9605],7);
 // 國土測繪中心公開 WMS：臺灣通用電子地圖 EMAP、正射影像 PHOTO2。
 const tileProviders=[
@@ -61,16 +68,20 @@ function setStatus(s){$('saveStatus').textContent='● '+s}
 const noParkingDefaults={'路口':10,'公車站':10,'消防栓':5,'消防車出入口':5};
 const noParkingDescriptions={'路口':'十公尺內禁停','公車站':'十公尺內禁停','消防栓':'五公尺內禁停','消防車出入口':'五公尺內禁停'};
 function validCoordinates(lat,lng){return Number.isFinite(lat)&&Number.isFinite(lng)&&lat>=-90&&lat<=90&&lng>=-180&&lng<=180}
+function roundCoordinate(value){return Number(Number(value).toFixed(6))}
+function syncObstacleVisibility(){$('obstacleDetails').style.display=$('hasObstacle').value==='有'?'block':'none'}
+$('hasObstacle').addEventListener('change',syncObstacleVisibility);
+$('calibrateBtn').onclick=()=>{if(!editingId)return;calibratingPoint=true;closeModal();toast('請在地圖上點選新的校正位置')};
 function syncCoordinateInputs(ll){$('latitude').value=Number(ll.lat).toFixed(6);$('longitude').value=Number(ll.lng).toFixed(6)}
 function coordinateInputChanged(){const lat=parseFloat($('latitude').value),lng=parseFloat($('longitude').value);if(validCoordinates(lat,lng)){selectedLatLng=L.latLng(lat,lng);if(pendingMarker)pendingMarker.setLatLng(selectedLatLng);if(editingId&&markers.has(editingId))markers.get(editingId).setLatLng(selectedLatLng)}}
 function persist(msg='已儲存至本機'){try{localStorage.setItem(KEY,JSON.stringify({version:1,savedAt:new Date().toISOString(),records}));setStatus(msg+' '+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'}));return true}catch(e){setStatus('儲存失敗，請匯出備份');toast('本機儲存失敗，請立即匯出備份');return false}}
 function load(){try{const raw=localStorage.getItem(KEY);if(raw){const d=JSON.parse(raw);records=Array.isArray(d)?d:(d.records||[])}}catch(e){toast('讀取本機資料失敗，請匯入備份')} }
 function markerColor(r){return r.type==='身障'?'#8b5cf6':r.type==='卸貨'?'#e68a19':'#2678df'}
 function photoThumb(id,name){const box=$(id);box.textContent=name?`已選檔案：${name}`:'僅記錄檔名，不會上傳或儲存圖片';}
-function renderTags(containerId,options,selected){const box=$(containerId);box.innerHTML='';options.forEach(v=>{const b=document.createElement('button');b.type='button';b.className='tag-option'+(selected.includes(v)?' active':'');b.textContent=v;b.onclick=()=>{const a=new Set(getTags(containerId));if(a.has(v))a.delete(v);else a.add(v);setTags(containerId,[...a]);b.classList.toggle('active',a.has(v));if(v==='其他')$(containerId==='obstacleTags'?'obstacleOther':'conditionOther').style.display=a.has(v)?'block':'none'};box.appendChild(b)})}
+function renderTags(containerId,options,selected){const box=$(containerId);box.innerHTML='';options.forEach(v=>{const b=document.createElement('button');b.type='button';b.className='tag-option'+(selected.includes(v)?' active':'');b.textContent=v;b.onclick=()=>{const a=new Set(getTags(containerId));if(a.has(v))a.delete(v);else a.add(v);setTags(containerId,[...a]);b.classList.toggle('active',a.has(v));if(v==='其他')$('conditionOther').style.display=a.has(v)?'block':'none'};box.appendChild(b)})}
 function getTags(id){return [...$(id).querySelectorAll('.tag-option.active')].map(b=>b.textContent)}
-function setTags(id,values){$(id).querySelectorAll('.tag-option').forEach(b=>b.classList.toggle('active',values.includes(b.textContent)));const other=id==='obstacleTags'?'obstacleOther':'conditionOther';$(other).style.display=values.includes('其他')?'block':'none'}
-renderTags('obstacleTags',['電力、電信箱體','桿件','消防栓與防災設施','樹穴與行道樹','私設斜坡道與車道口','移動式雜物','施工圍籬與廢棄物','廢棄車輛與長期占用物','其他'],[]);renderTags('conditionTags',['無特殊情況','漆線剝落','塗銷漆線剝落','柏油坑洞','其他'],[]);
+function setTags(id,values){$(id).querySelectorAll('.tag-option').forEach(b=>b.classList.toggle('active',values.includes(b.textContent)));$('conditionOther').style.display=values.includes('其他')?'block':'none'}
+renderTags('conditionTags',['無特殊情況','漆線剝落','塗銷漆線剝落','柏油坑洞','其他'],[]);
 function getNoParkingSelected(){return [...$('noParkingTags').querySelectorAll('.tag-option.active')].map(b=>b.textContent)}
 function getNoParkingValues(){const out={};getNoParkingSelected().forEach(n=>{const el=$('noParking_'+n);out[n]=el?el.value:''});return out}
 function renderNoParkingInputs(values={}){const box=$('noParkingInputs');box.innerHTML='';getNoParkingSelected().forEach(n=>{const row=document.createElement('div');row.className='range-input-row';const label=document.createElement('label');label.textContent=n;const input=document.createElement('input');input.type='number';input.min='0';input.step='0.1';input.id='noParking_'+n;input.placeholder=noParkingDescriptions[n];input.value=values[n]??noParkingDefaults[n];const desc=document.createElement('span');desc.className='range-unit';desc.textContent=noParkingDescriptions[n];const unit=document.createElement('span');unit.className='range-unit';unit.textContent='公尺';row.append(label,input,unit,desc);box.append(row)})}
@@ -97,24 +108,55 @@ function applyRecentRoadSection(){
 }
 function selectPosition(latlng){if(!editingId&&!$('roadSection1').value.trim()&&!$('roadSection2').value.trim())applyRecentRoadSection();selectedLatLng=latlng;syncCoordinateInputs(latlng);if(pendingMarker)map.removeLayer(pendingMarker);if(!editingId){pendingMarker=L.marker(latlng,{draggable:true}).addTo(map);pendingMarker.on('dragstart',()=>{pendingMarker._oldLatLng=pendingMarker.getLatLng()});pendingMarker.on('dragend',()=>confirmMarkerMove(pendingMarker,pendingMarker._oldLatLng||selectedLatLng,pendingMarker.getLatLng()));$('formTitle').textContent='新增停車格資料'}openModal();if(!$('roadName').value.trim())lookupRoadName(latlng)}
 async function lookupRoadName(ll){try{const u=`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${ll.lat}&lon=${ll.lng}&zoom=18&addressdetails=1`;const res=await fetch(u);if(!res.ok)return;const d=await res.json();const a=d.address||{};const road=a.road||a.pedestrian||a.footway||a.path||a.residential||'';if(road&&!$('roadName').value.trim())$('roadName').value=road;}catch(e){/* 自動帶入失敗時由使用者手動輸入 */}}
-map.on('click',e=>{editingId=null;clearForm(false);applyRecentRoadSection();selectPosition(e.latlng);});$('latitude').addEventListener('change',coordinateInputChanged);$('longitude').addEventListener('change',coordinateInputChanged);
-function clearForm(clearPos=true){clearSaveError();['roadName','roadSection1','roadSection2','stallId','lengthM','widthM','obstacleOther','conditionOther','note'].forEach(id=>$(id).value='');renderNoParkingTags();$('surveyDate').value=new Date().toISOString().slice(0,10);$('type').value='一般';$('adjacency').value='單獨';$('photo1').value='';$('photo2').value='';photoThumb('photoPreview1','');photoThumb('photoPreview2','');renderTags('obstacleTags',['電力、電信箱體','桿件','消防栓與防災設施','樹穴與行道樹','私設斜坡道與車道口','移動式雜物','施工圍籬與廢棄物','廢棄車輛與長期占用物','其他'],[]);renderTags('conditionTags',['無特殊情況','漆線剝落','塗銷漆線剝落','柏油坑洞','其他'],[]);editingId=null;$('formTitle').textContent='新增停車格資料';$('deleteBtn').style.display='none';if(clearPos){selectedLatLng=null;$('latitude').value='';$('longitude').value='';$('coord').textContent='尚未選擇位置';if(pendingMarker){map.removeLayer(pendingMarker);pendingMarker=null}} }
-async function editRecord(id){const r=records.find(x=>x.id===id);if(!r)return;clearSaveError();if(pendingMarker){map.removeLayer(pendingMarker);pendingMarker=null}editingId=id;selectedLatLng=L.latLng(r.lat,r.lng);$('formTitle').textContent='編輯停車格資料';syncCoordinateInputs(selectedLatLng);$('roadName').value=r.roadName||r.road||'';const parts=String(r.roadSection||'').split('-');$('roadSection1').value=r.roadSectionStart??parts[0]??'';$('roadSection2').value=r.roadSectionEnd??parts.slice(1).join('-')??'';$('stallId').value=r.stallId||'';$('surveyDate').value=r.surveyDate||new Date().toISOString().slice(0,10);$('lengthM').value=r.lengthM||'';$('widthM').value=r.widthM||'';$('type').value=['一般','身障','卸貨'].includes(r.type)?r.type:'一般';$('adjacency').value=r.adjacency||'單獨';$('note').value=r.note||'';$('obstacleOther').value=r.obstacleOther||'';$('conditionOther').value=r.conditionOther||'';setTags('obstacleTags',r.obstacles||[]);setTags('conditionTags',r.conditions||[]);renderNoParkingTags(Object.keys(r.noParkingRanges||{}),r.noParkingRanges||{});$('photo1').value='';$('photo2').value='';photoThumb('photoPreview1',r.photo1Name||(r.photo1&&!r.photo1.startsWith('data:')?r.photo1:''));photoThumb('photoPreview2',r.photo2Name||(r.photo2&&!r.photo2.startsWith('data:')?r.photo2:''));$('deleteBtn').style.display='block';openModal()}
+map.on('click',e=>{
+ if(calibratingPoint&&editingId){
+  calibratingPoint=false;
+  selectedLatLng=L.latLng(roundCoordinate(e.latlng.lat),roundCoordinate(e.latlng.lng));
+  syncCoordinateInputs(selectedLatLng);
+  if(markers.has(editingId))markers.get(editingId).setLatLng(selectedLatLng);
+  $('coord').textContent='校正位置已選取；請按「儲存這筆資料」更新經緯度';
+  openModal();toast('已取得校正點位，儲存後更新經緯度');return;
+ }
+ editingId=null;clearForm(false);applyRecentRoadSection();selectPosition(e.latlng);
+});$('latitude').addEventListener('change',coordinateInputChanged);$('longitude').addEventListener('change',coordinateInputChanged);
+function clearForm(clearPos=true){clearSaveError();calibratingPoint=false;$('hasObstacle').value='無';syncObstacleVisibility();['roadName','roadSection1','roadSection2','stallId','lengthM','widthM','obstacleType','obstaclePosition','effectiveLength','effectiveWidth','obstaclePermanence','facilityLabel','reviewCode','conditionOther','note'].forEach(id=>$(id).value='');renderNoParkingTags();$('surveyDate').value=new Date().toISOString().slice(0,10);$('type').value='一般';$('adjacency').value='單獨';$('photo1').value='';$('photo2').value='';photoThumb('photoPreview1','');photoThumb('photoPreview2','');renderTags('conditionTags',['無特殊情況','漆線剝落','塗銷漆線剝落','柏油坑洞','其他'],[]);editingId=null;$('formTitle').textContent='新增停車格資料';$('deleteBtn').style.display='none';$('calibrationField').style.display='none';if(clearPos){selectedLatLng=null;$('latitude').value='';$('longitude').value='';$('coord').textContent='尚未選擇位置';if(pendingMarker){map.removeLayer(pendingMarker);pendingMarker=null}} }
+async function editRecord(id){const r=records.find(x=>x.id===id);if(!r)return;clearSaveError();if(pendingMarker){map.removeLayer(pendingMarker);pendingMarker=null}editingId=id;selectedLatLng=L.latLng(r.lat,r.lng);$('formTitle').textContent='編輯停車格資料';$('calibrationField').style.display='block';syncCoordinateInputs(selectedLatLng);$('roadName').value=r.roadName||r.road||'';const parts=String(r.roadSection||'').split('-');$('roadSection1').value=r.roadSectionStart??parts[0]??'';$('roadSection2').value=r.roadSectionEnd??parts.slice(1).join('-')??'';$('stallId').value=r.stallId||'';$('surveyDate').value=r.surveyDate||new Date().toISOString().slice(0,10);$('lengthM').value=r.lengthM||'';$('widthM').value=r.widthM||'';$('type').value=['一般','身障','卸貨'].includes(r.type)?r.type:'一般';$('adjacency').value=r.adjacency||'單獨';$('note').value=r.note||'';$('conditionOther').value=r.conditionOther||'';
+ const legacyObstacles=r.obstacles||[];
+ $('hasObstacle').value=r.hasObstacle||((legacyObstacles.length||r.obstacleType)?'有':'無');
+ $('obstacleType').value=r.obstacleType||(legacyObstacles[0]||'');
+ $('obstaclePosition').value=r.obstaclePosition||'';
+ $('effectiveLength').value=r.effectiveLength??'';
+ $('effectiveWidth').value=r.effectiveWidth??'';
+ $('obstaclePermanence').value=r.obstaclePermanence||'';
+ $('facilityLabel').value=r.facilityLabel||'';
+ $('reviewCode').value=r.reviewCode??'';
+ syncObstacleVisibility();setTags('conditionTags',r.conditions||[]);renderNoParkingTags(Object.keys(r.noParkingRanges||{}),r.noParkingRanges||{});$('photo1').value='';$('photo2').value='';photoThumb('photoPreview1',r.photo1Name||(r.photo1&&!r.photo1.startsWith('data:')?r.photo1:''));photoThumb('photoPreview2',r.photo2Name||(r.photo2&&!r.photo2.startsWith('data:')?r.photo2:''));$('deleteBtn').style.display='block';openModal()}
 $('photo1').onchange=()=>{photoThumb('photoPreview1',$('photo1').files[0]?.name||'');if($('photo1').files[0]&&$('saveError').textContent.includes('未上傳格位照片'))clearSaveError()};$('photo2').onchange=()=>photoThumb('photoPreview2',$('photo2').files[0]?.name||'');
 $('lengthM').addEventListener('input',()=>{if($('saveError').textContent.includes('長度'))clearSaveError()});
 $('widthM').addEventListener('input',()=>{if($('saveError').textContent.includes('寬度'))clearSaveError()});
 
 $('saveBtn').onclick=()=>{
- const lat=parseFloat($('latitude').value),lng=parseFloat($('longitude').value);
- if(!validCoordinates(lat,lng)){toast('請輸入有效的經緯度');return}
- selectedLatLng=L.latLng(lat,lng);
+ const rawLat=parseFloat($('latitude').value),rawLng=parseFloat($('longitude').value);
+ if(!validCoordinates(rawLat,rawLng)){toast('請輸入有效的經緯度');return}
+ const lat=roundCoordinate(rawLat),lng=roundCoordinate(rawLng);
+ selectedLatLng=L.latLng(lat,lng);syncCoordinateInputs(selectedLatLng);
  const length=$('lengthM').value.trim(),width=$('widthM').value.trim();
  if(length!==''&&(!Number.isFinite(Number(length))||Number(length)<4||Number(length)>7)){showSaveError('長度異常數值','lengthM');return}
  if(width!==''&&(!Number.isFinite(Number(width))||Number(width)<1||Number(width)>4)){showSaveError('寬度異常數值','widthM');return}
  const old=records.find(x=>x.id===editingId),p1=photoName('photo1',old?.photo1Name||old?.photo1),p2=photoName('photo2',old?.photo2Name||old?.photo2);
  if(!p1){showSaveError('未上傳格位照片','photo1');return}
  const s1=$('roadSection1').value.trim(),s2=$('roadSection2').value.trim();
- const r={id:editingId||('p'+Date.now()+Math.random().toString(36).slice(2,7)),lat,lng,roadName:$('roadName').value.trim(),roadSection:[s1,s2].filter(Boolean).join('-'),roadSectionStart:s1,roadSectionEnd:s2,stallId:$('stallId').value.trim(),surveyDate:$('surveyDate').value,lengthM:length,widthM:width,type:$('type').value,adjacency:$('adjacency').value,photo1Name:p1,photo2Name:p2,obstacles:getTags('obstacleTags'),obstacleOther:$('obstacleOther').value.trim(),conditions:getTags('conditionTags'),conditionOther:$('conditionOther').value.trim(),noParkingRanges:getNoParkingValues(),note:$('note').value.trim(),createdAt:old?.createdAt||new Date().toISOString(),updatedAt:new Date().toISOString()};
+ const r={id:editingId||('p'+Date.now()+Math.random().toString(36).slice(2,7)),lat,lng,roadName:$('roadName').value.trim(),roadSection:[s1,s2].filter(Boolean).join('-'),roadSectionStart:s1,roadSectionEnd:s2,stallId:$('stallId').value.trim(),surveyDate:$('surveyDate').value,lengthM:length,widthM:width,type:$('type').value,adjacency:$('adjacency').value,photo1Name:p1,photo2Name:p2,
+  hasObstacle:$('hasObstacle').value,
+  obstacleType:$('hasObstacle').value==='有'?$('obstacleType').value:'',
+  obstaclePosition:$('hasObstacle').value==='有'?$('obstaclePosition').value:'',
+  effectiveLength:$('hasObstacle').value==='有'?$('effectiveLength').value:'',
+  effectiveWidth:$('hasObstacle').value==='有'?$('effectiveWidth').value:'',
+  obstaclePermanence:$('hasObstacle').value==='有'?$('obstaclePermanence').value:'',
+  facilityLabel:$('hasObstacle').value==='有'?$('facilityLabel').value.trim():'',
+  reviewCode:$('hasObstacle').value==='有'?$('reviewCode').value:'',
+  obstacles:$('hasObstacle').value==='有'&&$('obstacleType').value?[$('obstacleType').value]:[],
+  conditions:getTags('conditionTags'),conditionOther:$('conditionOther').value.trim(),noParkingRanges:getNoParkingValues(),note:$('note').value.trim(),createdAt:old?.createdAt||new Date().toISOString(),updatedAt:new Date().toISOString()};
  if(editingId)records=records.map(x=>x.id===editingId?r:x);else records.push(r);
  if(!persist()){toast('儲存失敗，請先匯出備份');return}
  redrawMarkers();renderList();clearForm();closeModal();toast('資料已儲存')
@@ -166,7 +208,7 @@ function download(name,content,type){const blob=new Blob([content],{type});const
 
 const exportColumns=[
  'id','lat','lng','roadName','roadSection','stallId','surveyDate','lengthM','widthM','type','adjacency',
- 'photo1Name','photo2Name','obstacles','obstacleOther','conditions','conditionOther',
+ 'photo1Name','photo2Name','hasObstacle','obstacleType','obstaclePosition','effectiveLength','effectiveWidth','obstaclePermanence','facilityLabel','reviewCode','conditions','conditionOther',
  '疑屬禁停範圍_路口(公尺)','疑屬禁停範圍_公車站(公尺)','疑屬禁停範圍_消防栓(公尺)','疑屬禁停範圍_消防車出入口(公尺)',
  'note','createdAt','updatedAt'
 ];
@@ -175,7 +217,7 @@ function exportCSV(){
  const rows=[exportColumns,...records.map(r=>[
   r.id,r.lat,r.lng,r.roadName,r.roadSection||[r.roadSectionStart,r.roadSectionEnd].filter(Boolean).join('-'),
   r.stallId,r.surveyDate,r.lengthM,r.widthM,r.type,r.adjacency,r.photo1Name,r.photo2Name,
-  (r.obstacles||[]).join('、'),r.obstacleOther,(r.conditions||[]).join('、'),r.conditionOther,
+  r.hasObstacle||((r.obstacles||[]).length?'有':'無'),r.obstacleType||(r.obstacles||[])[0]||'',r.obstaclePosition||'',r.effectiveLength??'',r.effectiveWidth??'',r.obstaclePermanence||'',r.facilityLabel||'',r.reviewCode??'',(r.conditions||[]).join('、'),r.conditionOther,
   r.noParkingRanges?.['路口']??'',r.noParkingRanges?.['公車站']??'',r.noParkingRanges?.['消防栓']??'',
   r.noParkingRanges?.['消防車出入口']??'',r.note,r.createdAt,r.updatedAt
  ])];
