@@ -71,7 +71,25 @@ function validCoordinates(lat,lng){return Number.isFinite(lat)&&Number.isFinite(
 function roundCoordinate(value){return Number(Number(value).toFixed(6))}
 function syncObstacleVisibility(){$('obstacleDetails').style.display=$('hasObstacle').value==='有'?'block':'none'}
 $('hasObstacle').addEventListener('change',syncObstacleVisibility);
-$('calibrateBtn').onclick=()=>{if(!editingId)return;calibratingPoint=true;closeModal();toast('請在地圖上點選新的校正位置')};
+$('calibrateBtn').onclick=()=>{
+  if(!editingId)return;
+  if(!navigator.geolocation){toast('此瀏覽器不支援定位');return}
+  if(!window.isSecureContext){toast('定位功能需要 HTTPS 安全連線');return}
+  toast('正在取得目前 GPS 定位…');
+  navigator.geolocation.getCurrentPosition(p=>{
+    const ll=L.latLng(roundCoordinate(p.coords.latitude),roundCoordinate(p.coords.longitude));
+    selectedLatLng=ll;syncCoordinateInputs(ll);
+    if(markers.has(editingId))markers.get(editingId).setLatLng(ll);
+    $('coord').textContent='已取得目前 GPS 定位；請按「儲存這筆資料」更新經緯度';
+    toast('已取得目前定位，儲存後更新點位');
+  },e=>{
+    let message='無法取得目前定位，請確認已允許位置權限';
+    if(e.code===1)message='定位權限遭拒，請在瀏覽器設定中允許位置存取';
+    else if(e.code===2)message='目前無法取得 GPS 位置，請確認定位服務已開啟';
+    else if(e.code===3)message='定位逾時，請移至訊號較佳處再試';
+    toast(message);
+  },{enableHighAccuracy:true,maximumAge:0,timeout:20000});
+};
 function syncCoordinateInputs(ll){$('latitude').value=Number(ll.lat).toFixed(6);$('longitude').value=Number(ll.lng).toFixed(6)}
 function coordinateInputChanged(){const lat=parseFloat($('latitude').value),lng=parseFloat($('longitude').value);if(validCoordinates(lat,lng)){selectedLatLng=L.latLng(lat,lng);if(pendingMarker)pendingMarker.setLatLng(selectedLatLng);if(editingId&&markers.has(editingId))markers.get(editingId).setLatLng(selectedLatLng)}}
 function persist(msg='已儲存至本機'){try{localStorage.setItem(KEY,JSON.stringify({version:1,savedAt:new Date().toISOString(),records}));setStatus(msg+' '+new Date().toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'}));return true}catch(e){setStatus('儲存失敗，請匯出備份');toast('本機儲存失敗，請立即匯出備份');return false}}
@@ -120,7 +138,14 @@ map.on('click',e=>{
  editingId=null;clearForm(false);applyRecentRoadSection();selectPosition(e.latlng);
 });$('latitude').addEventListener('change',coordinateInputChanged);$('longitude').addEventListener('change',coordinateInputChanged);
 function clearForm(clearPos=true){clearSaveError();calibratingPoint=false;$('hasObstacle').value='無';syncObstacleVisibility();['roadName','roadSection1','roadSection2','stallId','lengthM','widthM','obstacleType','obstaclePosition','effectiveLength','effectiveWidth','obstaclePermanence','facilityLabel','reviewCode','conditionOther','note'].forEach(id=>$(id).value='');renderNoParkingTags();$('surveyDate').value=new Date().toISOString().slice(0,10);$('type').value='一般';$('adjacency').value='單獨';$('photo1').value='';$('photo2').value='';photoThumb('photoPreview1','');photoThumb('photoPreview2','');renderTags('conditionTags',['無特殊情況','漆線剝落','塗銷漆線剝落','柏油坑洞','其他'],[]);editingId=null;$('formTitle').textContent='新增停車格資料';$('deleteBtn').style.display='none';$('calibrationField').style.display='none';if(clearPos){selectedLatLng=null;$('latitude').value='';$('longitude').value='';$('coord').textContent='尚未選擇位置';if(pendingMarker){map.removeLayer(pendingMarker);pendingMarker=null}} }
-async function editRecord(id){const r=records.find(x=>x.id===id);if(!r)return;clearSaveError();if(pendingMarker){map.removeLayer(pendingMarker);pendingMarker=null}editingId=id;selectedLatLng=L.latLng(r.lat,r.lng);$('formTitle').textContent='編輯停車格資料';$('calibrationField').style.display='block';syncCoordinateInputs(selectedLatLng);$('roadName').value=r.roadName||r.road||'';const parts=String(r.roadSection||'').split('-');$('roadSection1').value=r.roadSectionStart??parts[0]??'';$('roadSection2').value=r.roadSectionEnd??parts.slice(1).join('-')??'';$('stallId').value=r.stallId||'';$('surveyDate').value=r.surveyDate||new Date().toISOString().slice(0,10);$('lengthM').value=r.lengthM||'';$('widthM').value=r.widthM||'';$('type').value=['一般','身障','卸貨'].includes(r.type)?r.type:'一般';$('adjacency').value=r.adjacency||'單獨';$('note').value=r.note||'';$('conditionOther').value=r.conditionOther||'';
+function normalizeDateForInput(value){
+  if(value===null||value===undefined||value==='')return '';
+  const text=String(value).trim();
+  const m=text.match(/^(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})$/);
+  if(m)return `${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`;
+  return text;
+}
+async function editRecord(id){const r=records.find(x=>x.id===id);if(!r)return;clearSaveError();if(pendingMarker){map.removeLayer(pendingMarker);pendingMarker=null}editingId=id;selectedLatLng=L.latLng(r.lat,r.lng);$('formTitle').textContent='編輯停車格資料';$('calibrationField').style.display='block';syncCoordinateInputs(selectedLatLng);$('roadName').value=r.roadName||r.road||'';const parts=String(r.roadSection||'').split('-');$('roadSection1').value=r.roadSectionStart??parts[0]??'';$('roadSection2').value=r.roadSectionEnd??parts.slice(1).join('-')??'';$('stallId').value=r.stallId||'';$('surveyDate').value=normalizeDateForInput(r.surveyDate)||new Date().toISOString().slice(0,10);$('lengthM').value=r.lengthM||'';$('widthM').value=r.widthM||'';$('type').value=['一般','身障','卸貨'].includes(r.type)?r.type:'一般';$('adjacency').value=r.adjacency||'單獨';$('note').value=r.note||'';$('conditionOther').value=r.conditionOther||'';
  const legacyObstacles=r.obstacles||[];
  $('hasObstacle').value=r.hasObstacle||((legacyObstacles.length||r.obstacleType)?'有':'無');
  $('obstacleType').value=r.obstacleType||(legacyObstacles[0]||'');
@@ -130,7 +155,7 @@ async function editRecord(id){const r=records.find(x=>x.id===id);if(!r)return;cl
  $('obstaclePermanence').value=r.obstaclePermanence||'';
  $('facilityLabel').value=r.facilityLabel||'';
  $('reviewCode').value=r.reviewCode??'';
- syncObstacleVisibility();setTags('conditionTags',r.conditions||[]);renderNoParkingTags(Object.keys(r.noParkingRanges||{}),r.noParkingRanges||{});$('photo1').value='';$('photo2').value='';photoThumb('photoPreview1',r.photo1Name||(r.photo1&&!r.photo1.startsWith('data:')?r.photo1:''));photoThumb('photoPreview2',r.photo2Name||(r.photo2&&!r.photo2.startsWith('data:')?r.photo2:''));$('deleteBtn').style.display='block';openModal()}
+ syncObstacleVisibility();setTags('conditionTags',r.conditions||[]);const savedNoParking=r.noParkingRanges||{};const selectedNoParking=Object.entries(savedNoParking).filter(([k,v])=>v!==''&&v!==null&&v!==undefined).map(([k])=>k);renderNoParkingTags(selectedNoParking,savedNoParking);$('photo1').value='';$('photo2').value='';photoThumb('photoPreview1',r.photo1Name||(r.photo1&&!r.photo1.startsWith('data:')?r.photo1:''));photoThumb('photoPreview2',r.photo2Name||(r.photo2&&!r.photo2.startsWith('data:')?r.photo2:''));$('deleteBtn').style.display='block';openModal()}
 $('photo1').onchange=()=>{photoThumb('photoPreview1',$('photo1').files[0]?.name||'');if($('photo1').files[0]&&$('saveError').textContent.includes('未上傳格位照片'))clearSaveError()};$('photo2').onchange=()=>photoThumb('photoPreview2',$('photo2').files[0]?.name||'');
 $('lengthM').addEventListener('input',()=>{if($('saveError').textContent.includes('長度'))clearSaveError()});
 $('widthM').addEventListener('input',()=>{if($('saveError').textContent.includes('寬度'))clearSaveError()});
@@ -255,7 +280,7 @@ function parseCSV(text){
  return rows.filter(r=>r.some(v=>v!=='')).map(values=>{
   const obj={};
   headers.forEach((key,i)=>{obj[key]=values[i]??''});
-  obj.lat=toNumber(obj.lat);obj.lng=toNumber(obj.lng);
+  obj.lat=toNumber(obj.lat);obj.lng=toNumber(obj.lng);obj.surveyDate=normalizeDateForInput(obj.surveyDate);
   if(obj.lengthM!==undefined)obj.lengthM=toNumber(obj.lengthM);
   if(obj.widthM!==undefined)obj.widthM=toNumber(obj.widthM);
   obj.obstacles=String(obj.obstacles||'').split('、').filter(Boolean);
@@ -264,12 +289,14 @@ function parseCSV(text){
   const parts=String(obj.roadSection).split('-');
   obj.roadSectionStart=obj.roadSectionStart||parts[0]||'';
   obj.roadSectionEnd=obj.roadSectionEnd||parts.slice(1).join('-');
-  obj.noParkingRanges={
+  const importedRanges={
    '路口':obj['疑屬禁停範圍_路口(公尺)']??'',
    '公車站':obj['疑屬禁停範圍_公車站(公尺)']??'',
    '消防栓':obj['疑屬禁停範圍_消防栓(公尺)']??'',
    '消防車出入口':obj['疑屬禁停範圍_消防車出入口(公尺)']??''
+  
   };
+  obj.noParkingRanges=Object.fromEntries(Object.entries(importedRanges).filter(([k,v])=>v!==''&&v!==null&&v!==undefined));
   delete obj['疑屬禁停範圍_路口(公尺)'];delete obj['疑屬禁停範圍_公車站(公尺)'];
   delete obj['疑屬禁停範圍_消防栓(公尺)'];delete obj['疑屬禁停範圍_消防車出入口(公尺)'];
   return obj;
@@ -283,6 +310,7 @@ $('importFile').onchange=async e=>{
   if(f.name.toLowerCase().endsWith('.csv'))incoming=parseCSV(content);
   else{const d=JSON.parse(content);incoming=Array.isArray(d)?d:d.records}
   if(!Array.isArray(incoming))throw Error('格式錯誤');
+  incoming=incoming.map(r=>{const item={...r,surveyDate:normalizeDateForInput(r.surveyDate)};const ranges=item.noParkingRanges||{};item.noParkingRanges=Object.fromEntries(Object.entries(ranges).filter(([k,v])=>v!==''&&v!==null&&v!==undefined));return item;});
   if(!confirm(`檔案內有 ${incoming.length} 筆資料。匯入會覆蓋目前 ${records.length} 筆資料，確定繼續？`))return;
   records=incoming;
   if(!persist('資料已匯入'))throw Error('儲存失敗');
